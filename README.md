@@ -4,4 +4,4 @@
  
  Input file and example is as follws below: 
  GET Request - http://localhost:8080/trading/signal/1234 
- Authentication used - Basic Autnebtication 
+ Authentication used - Basic Authentication 
