@@ -1,0 +1,27 @@
+package com.code.challenge.trading.configuration;
+
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@Configuration()
+@ConfigurationProperties(prefix = "trading")
+@Data
+public class SignalConfiguration {
+
+    private String specificationMapping;
+
+    public Map<String,String> mapSignalSpecification(){
+
+        Map<String,String> signalSpcification = new HashMap<>();
+        String[] specifications = specificationMapping.split(",");
+        for(String specification : specifications){
+            String[] specArray = specification.split(":");
+            signalSpcification.put(specArray[1],specArray[0]);
+        }
+        return signalSpcification;
+    }
+}
