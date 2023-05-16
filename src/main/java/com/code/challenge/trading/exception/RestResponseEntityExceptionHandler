@@ -1,0 +1,61 @@
+package com.code.challenge.trading.exception;
+
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.util.concurrent.TimeoutException;
+
+@ControllerAdvice
+public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(value = { HttpClientErrorException.Unauthorized.class })
+    protected ResponseEntity<Object> handleUnauthorizedException(
+            RuntimeException ex, WebRequest request) {
+
+        return handleExceptionInternal(ex, ex.getMessage(),
+                new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
+    }
+
+    @ExceptionHandler(value = { HttpClientErrorException.Forbidden.class })
+    protected ResponseEntity<Object> handleForbiddenException(
+            RuntimeException ex, WebRequest request) {
+
+        return handleExceptionInternal(ex, ex.getMessage(),
+                new HttpHeaders(), HttpStatus.FORBIDDEN, request);
+    }
+
+    @ExceptionHandler(value = { HttpClientErrorException.TooManyRequests.class })
+    protected ResponseEntity<Object> handleTooManyRequestsException(
+            RuntimeException ex, WebRequest request) {
+
+        return handleExceptionInternal(ex,ex.getMessage(),
+                new HttpHeaders(), HttpStatus.TOO_MANY_REQUESTS, request);
+    }
+
+    @ExceptionHandler(value
+            = { TimeoutException.class})
+    protected ResponseEntity<Object> handleTimeOutException(
+            RuntimeException ex, WebRequest request) {
+
+        return handleExceptionInternal(ex, ex.getMessage(),
+                new HttpHeaders(), HttpStatus.REQUEST_TIMEOUT, request);
+    }
+
+    @ExceptionHandler(value
+            = {HttpClientErrorException.UnprocessableEntity.class })
+    protected ResponseEntity<Object> handleBadFormatRequest(
+            RuntimeException ex, WebRequest request) {
+
+        return handleExceptionInternal(ex, ex.getMessage(),
+                new HttpHeaders(), HttpStatus.UNPROCESSABLE_ENTITY, request);
+    }
+
+
+}
