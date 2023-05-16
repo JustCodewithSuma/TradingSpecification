@@ -1,0 +1,6 @@
+trading:
+  specificationMapping: "setup:1,reverse:2,setalgoparam:3,performcalc:4,submittomarket:5,canceltrades:0"
+
+spring:
+  profile:
+    active : default
