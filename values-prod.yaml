@@ -1,0 +1,42 @@
+
+environment:
+  name: "prod"
+  environmentName: "prod"
+  replicas:
+    quantity: 1
+  resources:
+    xmx: 700M
+    xms: 200M
+    requests:
+      memory: "800Mi"
+      cpu: "100m"
+    limits:
+      memory: "2Gi"
+      cpu: "2"
+
+spring:
+  application:
+    name: trading-specification-service
+
+image:
+  name: "tradingSpecificationApi"
+  tag: "latest"
+  debug:
+    enabled: false
+    port: 1234
+
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: 8080
+  name: trading-service
+
+ingress:
+  host: trading.signal.specification
+
+pullsecret:
+  enabled: true
+  name: test-pull-secret
+
+application:
+  name: trading-service
