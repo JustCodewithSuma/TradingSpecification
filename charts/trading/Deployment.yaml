@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.service.name }}
+  labels:
+    app: {{ .Values.service.name }}
+    version: {{ .Values.image.tag }}
+spec:
+  replicas: {{ .Values.environment.replicas.quantity }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 2
+  selector:
+    matchLabels:
+      app: {{ .Values.service.name }}
+  template:
+    metadata:
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - {{ .Values.service.name }}
+              topologyKey: kubernetes.io/hostname
+              weight: 100
+      containers:
+        - name: {{ .Values.service.name }}
+          image: {{ .Values.image.name }}:{{ .Values.image.tag }}
+          env:
+            - name: ENVIRONMENT_NAME
+              value: {{ .Values.environment.name }}
+            - name: APPLICATION_NAME
+              value: {{ .Values.service.name }}
+            - name: JAVA_OPTIONS_EXT
+              value: "-Xms{{ .Values.environment.resources.xms }} -Xmx{{ .Values.environment.resources.xmx }} -XX:+AlwaysPreTouch -XX:+UseStringDeduplication -XX:+UseG1GC"
+            - name: SPRING_PROFILE
+              value: {{ .Values.environment.name }}
+            - name: JAVA_ENABLE_DEBUG
+              value: {{ .Values.image.debug.enabled | quote }}
+            - name: JAVA_DEBUG_PORT
+              value: {{ .Values.image.debug.port | toString | quote }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+          {{- if .Values.image.debug.enabled }}
+          - name: debugger
+            containerPort: {{ .Values.image.debug.port }}
+          {{- end}}
+
+          resources:
+            requests:
+              memory: {{ .Values.environment.resources.requests.memory }}
+              cpu: {{ .Values.environment.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.environment.resources.limits.memory }}
+              cpu: {{ .Values.environment.resources.limits.cpu }}
+          volumeMounts:
+            - name: {{ .Chart.Name }}-config-volume
+              mountPath: "lib/usr/config"
+              readOnly: true
+
+      volumes:
+        - name: {{ .Chart.Name }}-config-volume
+          configMap:
+            name: {{ .Chart.Name }}-configmap
+            items:
+                - key: application.yaml
+                  path: application.yaml
+      restartPolicy: {{ .Values.image.restartPolicy }}
