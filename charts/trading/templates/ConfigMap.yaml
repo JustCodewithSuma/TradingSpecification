@@ -1,0 +1,17 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ .Chart.Name }}-configmap
+data:
+  application.yaml: |-
+    spring:
+      profile:
+        active: {{ .Values.environment.name }}
+      application:
+        name: {{ .Values.service.name }}
+      
+      level:
+        org:
+          springframework:
+            web: {{ .Values.logging.level.org.springframework.web }}
+    
